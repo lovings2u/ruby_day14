@@ -1,0 +1,11 @@
+<h2>다음카페에 오신것을 환영합니다.</h2>
+
+<div class="list-group">
+    <% @cafes.each do |cafe| %>
+        <%= link_to cafe.title, cafe_path(cafe), class: "list-group-item list-group-item-action" %>
+        
+    <% end %>
+</div>
+<div class="text-center">
+    <%= link_to '카페 개설하기', new_cafe_path, class: 'btn btn-success' %>
+</div>

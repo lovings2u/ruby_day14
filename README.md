@@ -1,198 +1,98 @@
-# 20180626_Day12
+# 20180627_Day13
 
-### scaffold의 form_for
+### 오전과제
 
-- 지금까지 2주정도의 시간동안 사용했던 `form_tag` 는 모델의 객체와 관계없이 우리가 사용하고자 하는 형태대로 많은 것을 가능하게 했다. 이에 반해 `form_for` 는 모델의 객체와 관련을 두어 모델의 컬럼과 관련있는 `params` 만 받을 수 있게 설정할 수 있다.
-
-```erb
-<%= form_for(@post) do |f| %>
-	<%= f.text_field :title %>
-	<%= f.text_area :contents %>
-	<%= f.submit %>
-<% end %>
-```
-
-- 위의 코드는 `Post` 모델에 `title` 과 `contents` 컬럼이 있는 경우 해당 컬럼에 해당하는 파라미터를 생성할 수 있다.
-- 기본의 파라미터의 형태가 `params: {title: "title", contents: "contents"} ` 였다면, `form_for` 에서 만들어지는 파라미어터의 형태는 `params: {post: {title: "title", contents: "contents"}}` 의 형태가 된다.
-- `form_for` 는 굉장히 많은 부분과 연관되어 있다. 라우팅, 모델, 컨트롤러에 연관되어 있는데, 모델 부분은 이전에 이야기 했던 것처럼 특정 모델의 객체가 가지고 있는 컬럼에 대한 input만 만들 수 있다.
-
-> ```
-> form_for(record, options = {}, &block)
-> ```
->
-> Creates a form that allows the user to create or update the attributes of a specific model object.
->
-> 출처: `form_for` 와 관련된 [API-Dock](https://apidock.com/rails/ActionView/Helpers/FormHelper/form_for)
-
-- `form_for` 에 어떤 객체를 넘기느냐에 따라서 각기 다른 `action` 이 설정된다.
-
-```erb
-<%= form_for @post do |f| %>
-  ...
-<% end %>
-```
-
-의 코드는
-
-```erb
-<%= form_for @post, as: :post, url: post_path(@post), method: :patch, html: { class: "edit_post", id: "edit_post_45" } do |f| %>
-  ...
-<% end %>
-```
-
-와 같은 코드로 변환된다.
-
-- 위의 경우는 `@post` 가 이미 table에 저장되어 있는 경우에 해당한다. 이미 저장되어 있던 값일 경우에 기존의 값을 수정하는 코드로 변환된다. 반대로 `@post` 가 `Post.new` 에 의해 새로 만들어진 빈 껍데이길 경우 다음과 같은 코드로 변환된다.
-
-```erb
-<%= form_for(Post.new) do |f| %>
-  ...
-<% end %>
-```
-
-의 코드는
-
-```erb
-<%= form_for @post, as: :post, url: posts_path, html: { class: "new_post", id: "new_post" } do |f| %>
-  ...
-<% end %>
-```
-
-와 같은 코드로 변환된다.
-
-- 우리가 scaffold 명령어를 통해 만들어진 컨트롤러를 확인할 때 `new` 액션에도 `@post = Post.new` 라는 코드가 들어가있는 것을 확인할 수 있었는데, 실제로 `_form` 을 통해 `new` 와  `edit` 에서 사용하는 form을 같은 파일로 사용하기 위해 사용됐다.
+- M:N관계의 예시 5가지 이상 적어보기 
 
 
 
-### Route prefix
+### bcrypt
 
-- 스캐폴드로 만들어진 내용을 차근차근 살펴보다보면 `link_to` 의 url이 들어갈 부분에  `new_post_path`나 `edit_post_path` 와 같은 변수 형태가 들어가있는 것을 확인할 수 있다. 이것은 레일즈에서 제공하는 view helper의 일종으로 루비 코드로 url을 만들어 낼 수 있다.
+- 그동안 로그인, 회원가입 시에 비밀번호는 일반 문자열로 저장되었었다. 하지만 일반 사이트에서 비밀번호를 평범한 문자열로 저장하는 것은 있을 수 없는 일이다. 간단한 `bcrypt` 잼을 이용하여 비밀번호를 암호화하여 저장하고 로그인 시 복호화하여 사용하는 방법을 배워보자.
 
-```command
-$ rake routes
-          Prefix Verb   URI Pattern                          Controller#Action
-		   posts GET    /posts(.:format)                     posts#index
-                 POST   /posts(.:format)                     posts#create
-        new_post GET    /posts/new(.:format)                 posts#new
-       edit_post GET    /posts/:id/edit(.:format)            posts#edit
-            post GET    /posts/:id(.:format)                 posts#show
-                 PATCH  /posts/:id(.:format)                 posts#update
-                 PUT    /posts/:id(.:format)                 posts#update
-                 DELETE /posts/:id(.:format)                 posts#destroy
-```
-
-- Prefix 부분에 앞에서 언급했던 `new_post_path` 나 `edit_post_path` 부분과 유사한 모습의 코드를 볼 수 있다. 바로 이  Prefix 부분에 `_path` 혹은 `_url` 을 붙여주면 해당 uri나 url을 만들 수 있다.
-
-```erb
-<%= link_to 'new', new_post_path %>
-
-<a href="/posts/new">new</a>
-```
-
-- 이러한 형태로 대체할 수 있다.
-
-
-
-### Comment(댓글기능)
-
-*붙여넣기*
-
-
-
-### M:N
-
-- 우리는 유저와 작성글의 관계, 작성글과 댓글의 관계 등을 통해 1대 다(1:N)관계에 대해서 알아보았다. 하지만 1대 다 관계만으로는 구현할 수 없는 부분이 많이 있다. 대표적으로 특정 유저가 카페에 가입한다고 했을 때, 유저는 여러개의 카페에 가입할 수 있지만 카페도 여러명의 유저를 회원으로 만들 수 있다. 이러한 관계를 M:N 혹은 다대다 라고 한다.
-- 다대다 관계는 반드시 중간에 Join Table이 있어야 한다. 이 Join Table은 M쪽의 id와 N쪽의 id 를 각각 컬럼으로 가지고 있으면서 양쪽의 관계가 성립하게 한다.
-
-```command
-$ rails g model user user_name:string
-$ rails g model daum title:string
-$ rails g model membership user_id:integer daum_id:integer
-```
-
-*db/migrate/create_memberships*
+*Gemfile*
 
 ```ruby
-class CreateMemberships < ActiveRecord::Migration[5.0]
-  def change
-    create_table :memberships do |t|
-      t.integer :user_id
-      t.integer :daum_id
-      t.timestamps
-    end
-  end
-end
+gem 'bcrypt'
 ```
 
-> Rails 공식 가이드에서는 다음과 같은 이미지로 표현하고 있다.
->
-> ![m:n](http://guides.rubyonrails.org/images/has_many_through.png)
-
-- 일단 이미지의 형태만 기억하자
-
-*app/models/membership.rb*
-
-```ruby
-class Membership < ApplicationRecord
-    belongs_to :user
-    belongs_to :daum
-end
+```command
+$ bundle install
 ```
 
 *app/models/user.rb*
 
 ```ruby
 class User < ApplicationRecord
-    has_many :memberships
-end
-```
-
-*app/models/daum.rb*
-
-```ruby
-class Daum < ApplicationRecord
-    has_many :memberships
-end
-```
-
-- 코드가 완성되면 왠지 느낌은 양쪽에 연결되었으니 정상적으로 동작할 것같다. 먼저 우리가 원하는 형태를 살펴보자
-
-```text
-1번 유저는 1,2,3번 카페에 가입했다.
-2번 유저는 2,3번 카페에 가입했다.
-3번 유저는 1,3번 카페에 가입했다.
-
-1번 카페에는 1,3번 유저가 있다.
-2번 카페에는 1,2번 유저가 있다.
-3번 카페에는 1,2,3번 유저가 있다.
-```
-
-- 그리고 이를 의사코드로 변환하면 다음과 같다.
-
-```text
-1번 유저는 1,2,3번 카페에 가입했다.
-u1.daums # => [1번카페, 2번카페, 3번카페]
+	has_secure_password    
 ...
-
-1번 카페에는 1,3번 유저가 있다.
-d1.users # => [1번유저, 3번유저]
 ```
 
-- 하지만 아마도 지금의 코드는 위와같이 동작하지 않을 것이다. 이를 동작시키기 위해서 '여러개 가지고 있는 membership들을 통해 daum 혹은 user를 여러개 가진다' 라는 의미의 코드를 추가해야한다.
+- 기본적인 설정은 끝났지만 비밀번호를 받아 암호화하여 저장할 컬럼 설정이 필요하다.
+
+*db/migrate/create_user.rb*
 
 ```ruby
-class Daum < ApplicationRecord
-    has_many :memberships
-    has_many :users, through: :memberships
+class CreateUsers < ActiveRecord::Migration[5.0]
+  def change
+    create_table :users do |t|
+      t.string :user_name
+      t.string :password_digest
+
+      t.timestamps
+    end
+  end
 end
 ```
 
-```ruby
-class User < ApplicationRecord
-    has_many :memberships
-    has_many :daums, through: :memberships
-end
+- `password_digest` 컬럼은 암호화된 문자열을 저장할 것이다. 우리는 다음과 같은 방식으로 유저 정보를 저장하면 된다.
+
+```command
+$ rails c
+> User.create(user_name: "haha", password: "1234", password_confirmation: "1234")
+#<User id: 2, user_name: "haha", password_digest: "$2a$10$MiTBq98.kTrcuV3CrIZ3FOdpST92k33A6s0u.IVOU4X...", created_at: "2018-06-27 08:08:34", updated_at: "2018-06-27 08:08:34"> 
 ```
 
-- 이렇게 추가하면 `u1.daums` 와 `c1.users` 와 같은 코드도 동작하게 된다.
-- 추후에 더 사용하면서 익혀보도록 하자.
+- 결과적으로 암호화된 문자열이 저장될 것이다.
+
+
+
+### form_for 의 조건
+
+- scaffold를 배우면서 처음 `form_for`를 접하고 잘 이해가 안가는 부분이 많을 것이다. `form_for`를 이해하기 위해서는 기본적으로 model + controller 라는 것을 생각해야 한다. 단순히 form을 만들고 input을 우리가 원하는 이름으로 지정했다면, `form_for`는 model에서 테이블에 설정된 컬럼에 맞춰서 사용한다고 생각해야 한다. input 태그의 타입이 어떤 것이든 상관없다. 하지만 반드시 `form_for` 의 매개변수로 설정된 변수(모델의 인스턴스)와 관련된 모델의 컬럼이 존재해야한다.(*value 속성을 주는 경우는 제외*) 
+
+```ruby
+<%= form_for(Cafe.new) do |f| %>
+	<%= f.text_field :title %>
+    <%= f.text_area :description %>
+<% end %>
+```
+
+- `Cafe` 모델에 새로운 데이터를 추가하는 `form_for`이다. 아마도 title, description 컬럼을 가지고 있는 것으로 예상할 수 있다.
+- `form_for`는 또한 controller 이름, route와도 연관이 있다. `form_for`를 사용할 경우 기본적으로 routes.rb에서 `resources`를 사용한 것으로 간주하고 매개변수로 사용하는 모델의 이름과 관련된 route를 자동으로 만들어 버린다. 만약에 모델명은 `daum`, 컨트롤러명은 `cafe`로 했다면 `form_for`를 사용하는 것이 적절하지 않다.
+
+
+
+### M:N Relation 설정하기
+
+- 바로 어제 다대다 관계를 설정했는데, 실제 코드에는 적용해보지 않았다. 카페를 개설하는 과정에서 개설한 사람의 user_name이 자동으로 카페의 master_name에 들어가고 해당 유저가 카페에 가입하는 로직을 추가해보자.
+
+*app/controllers/cafes_controller.rb*
+
+```ruby
+...
+    def create
+        @cafe = Daum.new(daum_params)
+        @cafe.master_name = current_user.user_name
+        if @cafe.save
+            Membership.create(daum_id: @cafe.id, user_id: current_user.id)
+            redirect_to cafe_path(@cafe), flash: {success: "카페가 개설되었습니다."}
+        else
+            redirect_to :back, flash: {danger: "카페 개설에 실패했습니다."}
+        end
+    end
+...
+```
+
+- *cafe*와 *user*의 관계를 설정하는 *join table*인 *membership* 테이블에 양쪽의 id를 각각 넣어서 관계를 추가한다.  이제 카페를 개설하고 개설한 사람의 이름이 이 카페의 주인 이름으로 저장되고, 자동으로 가입된다. 
+

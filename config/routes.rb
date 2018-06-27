@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   
-  root 'posts#index'
+  root 'cafes#index'
   
   resources :posts
   post 'posts/:id/comments/create' => 'comments#create'
@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   
   # cafe
   resources :cafes, except: [:destroy]
+  post '/join_cafe/:cafe_id' => 'cafes#join_cafe', as: 'join_cafe'
   
   # authenticate
   get '/sign_up' => 'authenticate#sign_up'

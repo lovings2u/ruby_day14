@@ -11,11 +11,19 @@
 
 <p>
   <strong>ImagePath:</strong>
-  <%= @post.image_path %>
+  <img src="<%= @post.image_path %>" width="50%" />
+</p>
+<p>
+  <strong>Thumb Fill:</strong>
+  <img src="<%= @post.image_path.thumb_fill.url %>" />
+</p>
+<p>
+  <strong>Thumb Fit:</strong>
+  <img src="<%= @post.image_path.thumb_fit.url %>" />
 </p>
 
 <%= link_to '수정', edit_post_path(@post), class: 'btn btn-warning text-white' %> |
-<%= link_to '목록', posts_path, class: 'btn btn-info' %>|
+<%= link_to '목록', cafe_path(@post.daum), class: 'btn btn-info' %>|
 <%= link_to '삭제', post_path(@post), class: 'btn btn-danger', method: 'DELETE', data: {confirm: "삭제하시겠습니까?"} %>
 
 <hr>

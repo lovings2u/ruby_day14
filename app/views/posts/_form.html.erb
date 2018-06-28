@@ -1,5 +1,4 @@
 <%= form_for(post, html: {class: 'text-center'}) do |f| %>
-  <%= f.text_field :ccc, class: "test" %>
   <div class="field">
     <%= f.label :title %>
     <%= f.text_field :title, class: 'form-control' %>
@@ -8,6 +7,11 @@
   <div class="field">
     <%= f.label :contents %>
     <%= f.text_area :contents, class: 'form-control' %>
+  </div>
+  
+  <div class="field">
+    <%= f.label :image_path %>
+    <%= f.file_field :image_path, class: 'form-control' %>
   </div>
 
   <div class="actions">

@@ -10,7 +10,7 @@ class CafesController < ApplicationController
     # 카페 내용물을 보여주는 페이지(이 카페의 게시물)
     def show
         @cafe = Daum.find(params[:id])
-        # session[:current_cafe] = @cafe.id
+        session[:current_cafe] = @cafe.id
     end
     
     # 카페를 개설하는 페이지
@@ -25,13 +25,30 @@ class CafesController < ApplicationController
             Membership.create(daum_id: @cafe.id, user_id: current_user.id)
             redirect_to cafe_path(@cafe), flash: {success: "카페가 개설되었습니다."}
         else
+            p @cafe.errors
             redirect_to :back, flash: {danger: "카페 개설에 실패했습니다."}
         end
     end
     
     def join_cafe
-        Membership.create(daum_id: params[:cafe_id], user_id: current_user.id)
-        redirect_to :back, flash: {success: "카페 가입에 성공했습니다."}
+        cafe = Daum.find(params[:cafe_id])
+        # 사용자가 가입하려는 카페
+        if cafe.is_member?(current_user)
+            #가입 실패
+            redirect_to :back, flash: {danger: "카페 가입에 실패했습니다. 이미 가입된 카페입니다."}
+        else
+            # 가입 성공
+            Membership.create(daum_id: params[:cafe_id], user_id: current_user.id)
+            redirect_to :back, flash: {success: "카페 가입에 성공했습니다."}
+        end
+        # 이 카페에 현재 로그인된 사용자가 가입이 됐는지
+    
+        # 중복가입을 막을 수 없음
+        # 1. 가입버튼을 안보이게 한다. (사용자 화면 조작) -> Model 코딩(메서드)
+        # 2. 중복 가입 체크 후 진행 (서버에서 로직조작) -> Model Validation
+        
+        # 현재 이 카페에 가입된 유저중에 지금 로그인한 유저가 있니?
+        
     end
     # 카페 정보 수정하는 페이지
     # 카페 정보를 실제로 수정하는 로직

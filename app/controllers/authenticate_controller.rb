@@ -6,10 +6,11 @@ class AuthenticateController < ApplicationController
     def user_sign_up
         @user = User.new(user_name: params[:user_name],
                          password: params[:password],
-                         password_confirmation: params[:confirmation])
+                         password_confirmation: params[:password_confirmation])
         if @user.save
             redirect_to root_path, flash: {success: '회원가입 성공'}
         else
+            p @user.errors
             redirect_to :back, flash: {success: '회원가입 실패'}
         end
     end
